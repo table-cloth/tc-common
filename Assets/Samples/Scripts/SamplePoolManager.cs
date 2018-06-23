@@ -20,6 +20,11 @@ public class SamplePoolManager : MonoBehaviour
         StartCoroutine(RepeatSpawnPoolableObject(SpawnDelay));
     }
 
+    /// <summary>
+    /// Repeats the spawn poolable object.
+    /// </summary>
+    /// <returns>The spawn poolable object.</returns>
+    /// <param name="_delay">Delay.</param>
     private IEnumerator RepeatSpawnPoolableObject(float _delay)
     {
         yield return new WaitForSeconds(_delay);
