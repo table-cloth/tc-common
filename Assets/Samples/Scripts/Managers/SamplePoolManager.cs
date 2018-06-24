@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TC;
 
 /// <summary>
 /// Sample pool manager.
@@ -14,6 +15,9 @@ public class SamplePoolManager : MonoBehaviour
     private PoolableObject poolableObject;
     private Pool pool;
 
+    /// <summary>
+    /// Start this instance.
+    /// </summary>
     public void Start()    
     {
         pool = new Pool(poolableObject);
