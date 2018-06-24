@@ -15,6 +15,7 @@ public class SingletonManager : MonoBehaviour
         // Get instance of singleton every frame to check.
         SampleSingleton singleton = SampleSingleton.Instance;
         SampleMonoSingleton monoSingleton = SampleMonoSingleton.Instance;
+        SamplePersistentMonoSingleton persistentMonoSingleton = SamplePersistentMonoSingleton.Instance;
 
         if(singleton == null)
         {
@@ -23,6 +24,10 @@ public class SingletonManager : MonoBehaviour
         if(monoSingleton == null)
         {
             Debug.LogError("SampleMonoSingleton is null.");
+        }
+        if(persistentMonoSingleton == null)
+        {
+            Debug.LogError("SamplePersistentMonoSingleton is null.");
         }
     }
 }
