@@ -118,11 +118,17 @@ namespace TC
         /// </summary>
         protected virtual void Awake()
         {
+            if(instance != null && instance != this)
+            {
+                Debug.Log("Destroy self due to duplicate instance");
+                GameObject.Destroy(this.gameObject);
+            }
             InitializeInstance();
         }
 
         /// <summary>
         /// Initializes the instance.
+        /// If you do not want this GameObject to be reanamed, override this method.
         /// </summary>
         protected virtual void InitializeInstance()
         {

@@ -5,17 +5,26 @@ using UnityEngine;
 /// <summary>
 /// Singleton manager sample.
 /// </summary>
-public class SingletonManager : MonoBehaviour
+public class SampleSingletonManager : MonoBehaviour
 {
+    [SerializeField]
+    private SampleSingleton singleton;
+
+    [SerializeField]
+    private SampleMonoSingleton monoSingleton;
+
+    [SerializeField]
+    private SamplePersistentMonoSingleton persistentMonoSingleton;
+
     /// <summary>
     /// Update this instance.
     /// </summary>
     private void Update()
     {
         // Get instance of singleton every frame to check.
-        SampleSingleton singleton = SampleSingleton.Instance;
-        SampleMonoSingleton monoSingleton = SampleMonoSingleton.Instance;
-        SamplePersistentMonoSingleton persistentMonoSingleton = SamplePersistentMonoSingleton.Instance;
+        singleton = SampleSingleton.Instance;
+        monoSingleton = SampleMonoSingleton.Instance;
+        persistentMonoSingleton = SamplePersistentMonoSingleton.Instance;
 
         if(singleton == null)
         {
