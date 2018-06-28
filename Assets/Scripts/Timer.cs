@@ -199,6 +199,24 @@ namespace TC
             return Convert2IntSec(currentSec);
         }
 
+		/// <summary>
+		/// Gets the start second as int.
+		/// </summary>
+		/// <returns>The start int sec.</returns>
+		public int GetStartIntSec()
+		{
+			return Convert2IntSec(startSec);
+		}
+
+		/// <summary>
+		/// Gets the start second as int.
+		/// </summary>
+		/// <returns>The start int sec.</returns>
+		public int GetEndIntSec()
+		{
+			return Convert2IntSec(endSec);
+		}
+
         /// <summary>
         /// Converts float second into int second format.
         /// </summary>
