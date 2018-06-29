@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System;
+using TC;
 
 public class SampleAudioManager : MonoBehaviour
 {
@@ -20,7 +21,7 @@ public class SampleAudioManager : MonoBehaviour
             string audioFilePath = SampleAudioData.BGMResourceFilePaths[i];
             Button button = CreateButton(i.ToString(), () =>
             {
-                Debug.Log("On click " + audioFilePath);
+                AudioManager.Instance.PlayBGM(audioFilePath);
             });
             button.transform.SetParent(bgmButtonParent.transform);
         }
@@ -29,7 +30,7 @@ public class SampleAudioManager : MonoBehaviour
             string audioFilePath = SampleAudioData.SEResourceFilePaths[i];
             Button button = CreateButton(i.ToString(), () =>
             {
-                Debug.Log("On click " + audioFilePath);
+                AudioManager.Instance.PlaySE(audioFilePath);
             });
             button.transform.SetParent(
                 SampleAudioData.SEResourceFilePaths.Length / 2 >= i
@@ -37,7 +38,7 @@ public class SampleAudioManager : MonoBehaviour
                 : seButtonParent2.transform);
         }
 
-        AudioManager.CreateIfNeed();
+//        AudioManager.CreateIfNeed();
 	}
 
         

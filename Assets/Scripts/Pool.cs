@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TC;
+using NUnit.Framework;
 
 namespace TC
 {
@@ -49,11 +50,6 @@ namespace TC
             return poolObj;
         }
 
-        public List<PoolableObject> GetAllObjectsInPool()
-        {
-            return new List<PoolableObject>(pool);
-        }
-
         /// <summary>
         /// Returns pool instance to the pool.
         /// </summary>
@@ -62,6 +58,49 @@ namespace TC
         {
             pool.Enqueue(_poolableObject);
             _poolableObject.gameObject.SetActive(false);
+        }
+
+        /// <summary>
+        /// Peeks the pool object and receives peeked object.
+        /// By calling this method, PoolableObject still remains in Pool.
+        /// 
+        /// Will return null if _createIfPoolIsEmpty is pool is null and false.
+        /// </summary>
+        /// <param name="_createIfPoolIsEmpty">If set to <c>true</c> create if pool is empty.</param>
+        /// <param name="_parent">Parent.</param>
+        public PoolableObject Peek(bool _createIfPoolIsEmpty = false, Transform _parent = null)
+        {
+            if(!IsPoolObjectAvailable())
+            {
+                if(!_createIfPoolIsEmpty)
+                {
+                    return null;
+                }
+                // Create pool object for peeking
+                PoolableObject poolObj = CreatePoolableObject(null);
+                if(_parent != null)
+                {
+                    poolObj.transform.SetParent(_parent);
+                }
+                // Return this to pool for peeking.
+                Return2Pool(poolObj);
+            }
+
+            return pool.Peek();
+        }
+
+        /// <summary>
+        /// Gets all objects in pool.
+        /// </summary>
+        /// <returns>The all objects in pool.</returns>
+        public List<T> GetAllObjectsInPool<T>(Transform _parent) where T : PoolableObject
+        {
+            List<T> result = new List<T>();
+            while(IsPoolObjectAvailable())
+            {
+                result.Add(GetPoolableObject(_parent) as T);
+            }
+            return result;
         }
 
         /// <summary>
@@ -98,15 +137,5 @@ namespace TC
         {
             return pool.Count > 0;
         }
-    }
-
-    /// <summary>
-    /// Singleton pool.
-    /// For using same pool from separate classes / scenes.
-    /// </summary>
-    public class SingletonPool : Singleton<Pool>
-    {
-        // No special method is needed for this class.
-        // Just needs to be defined.
     }
 }
