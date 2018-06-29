@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TC;
 
 namespace TC
 {
@@ -97,5 +98,15 @@ namespace TC
         {
             return pool.Count > 0;
         }
+    }
+
+    /// <summary>
+    /// Singleton pool.
+    /// For using same pool from separate classes / scenes.
+    /// </summary>
+    public class SingletonPool : Singleton<Pool>
+    {
+        // No special method is needed for this class.
+        // Just needs to be defined.
     }
 }

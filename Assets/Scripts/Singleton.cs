@@ -112,7 +112,6 @@ namespace TC
             return Instance != null;
         }
 
-
         /// <summary>
         /// Awake this instance.
         /// </summary>
