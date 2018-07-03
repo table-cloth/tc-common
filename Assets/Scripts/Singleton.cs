@@ -131,7 +131,7 @@ namespace TC
         /// </summary>
         protected virtual void InitializeInstance()
         {
-            gameObject.name = this.GetType().FullName;
+            gameObject.name = this.GetType().Name;
         }
     }
 
