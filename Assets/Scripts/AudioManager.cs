@@ -5,7 +5,7 @@ using TC;
 using NUnit.Framework;
 using System;
 
-public class AudioManager : MonoSingleton<AudioManager>
+public class AudioManager : PersistentMonoSingleton<AudioManager>
 {
     // Pool
     private Pool sePool = null;
@@ -65,40 +65,20 @@ public class AudioManager : MonoSingleton<AudioManager>
             .Play(true);
     }
 
-    public AudioSourcePoolableObject FindActiveSE(string _audioResourceFilePath)
-    {
-        return null;
-    }
-
-    public AudioSourcePoolableObject FindActiveSE(string _audioResourceFilePath)
-    {
-        return null;
-    }
-
-    public AudioSourcePoolableObject FindActiveAudio(AudioType _audioType, string _audioResourceFilePath)
-    {
-        return null;
-    }
-
+    /// <summary>
+    /// Stops all SE.
+    /// </summary>
     public void StopAllSE()
     {
-        StopAll(activeSECacheList);
+        StopAllAudio(AudioType.SE);
     }
 
+    /// <summary>
+    /// Stops all BGM.
+    /// </summary>
     public void StopAllBGM()
     {
-        StopAll(activeBGMCacheList);
-    }
-
-    private void StopAll(List<AudioSourcePoolableObject> _audioPoolObjList)
-    {
-        foreach(AudioSourcePoolableObject audioPoolObj in _audioPoolObjList)
-        {
-            if(audioPoolObj != null)
-            {
-                audioPoolObj.Stop();
-            }
-        }
+        StopAllAudio(AudioType.BGM);
     }
 
     /// <summary>
@@ -119,11 +99,30 @@ public class AudioManager : MonoSingleton<AudioManager>
     }
 
     /// <summary>
+    /// Clears all AudioClip and Pool.
+    /// Audio currently played, will not be stopped nor cleared.
+    /// </summary>
+    public void ClearAllData()
+    {
+        ClearAudioClipCache();
+        ClearPool();
+    }
+
+    /// <summary>
     /// Clears the audio clip cache.
     /// </summary>
     public void ClearAudioClipCache()
     {
         cacheAudioClips.Clear();
+    }
+
+    /// <summary>
+    /// Clears the pool.
+    /// </summary>
+    public void ClearPool()
+    {
+        bgmPool.Clear();
+        sePool.Clear();
     }
 
     /// <summary>
@@ -133,17 +132,75 @@ public class AudioManager : MonoSingleton<AudioManager>
     {
         base.Awake();
         InitializePool();
+    }
 
-//        for(int i = 0; i < SampleAudioData.BGMResourceFilePaths.Length; i++)
-//        {
-//            string audioFilePath = SampleAudioData.BGMResourceFilePaths[i];
-//            GetOrCreate(AudioType.BGM, audioFilePath);
-//        }
-//        for(int i = 0; i < SampleAudioData.SEResourceFilePaths.Length; i++)
-//        {
-//            string audioFilePath = SampleAudioData.SEResourceFilePaths[i];
-//            GetOrCreate(AudioType.SE, audioFilePath);
-//        }
+    /// <summary>
+    /// Finds the active SE.
+    /// </summary>
+    /// <returns>The active S.</returns>
+    /// <param name="_audioResourceFilePath">Audio resource file path.</param>
+    private AudioSourcePoolableObject FindActiveSE(string _audioResourceFilePath)
+    {
+        return FindActiveAudio(AudioType.SE, _audioResourceFilePath);
+    }
+
+    /// <summary>
+    /// Finds the active BGM.
+    /// </summary>
+    /// <returns>The active background.</returns>
+    /// <param name="_audioResourceFilePath">Audio resource file path.</param>
+    private AudioSourcePoolableObject FindActiveBGM(string _audioResourceFilePath)
+    {
+        return FindActiveAudio(AudioType.BGM, _audioResourceFilePath);
+    }
+
+    private List<AudioSourcePoolableObject> GetAudioCacheList(AudioType _audioType)
+    {
+        return _audioType == AudioType.BGM ? activeBGMCacheList : activeSECacheList;
+    }
+
+    /// <summary>
+    /// Finds the active audio.
+    /// </summary>
+    /// <returns>The active audio.</returns>
+    /// <param name="_audioType">Audio type.</param>
+    /// <param name="_audioResourceFilePath">Audio resource file path.</param>
+    private AudioSourcePoolableObject FindActiveAudio(AudioType _audioType, string _audioResourceFilePath)
+    {
+        // If no cache is found, will assume there is no active SE with given filePath.
+        if(!cacheAudioClips.ContainsKey(_audioResourceFilePath))
+        {
+            return null;
+        }
+
+        string audioName = cacheAudioClips[_audioResourceFilePath].name;
+        List<AudioSourcePoolableObject> activeAudioCacheList = GetAudioCacheList(_audioType);
+        foreach(AudioSourcePoolableObject audio in activeAudioCacheList)
+        {
+            if(audio.name == audioName)
+            {
+                return audio;
+            }
+        }
+
+        // No audio that matches the name exists.
+        return null;
+    }
+
+    /// <summary>
+    /// Stops all audio.
+    /// </summary>
+    /// <param name="_audioPoolObjList">Audio pool object list.</param>
+    private void StopAllAudio(AudioType _audioType)
+    {
+        List<AudioSourcePoolableObject> activeAudioCacheList = GetAudioCacheList(_audioType);
+        foreach(AudioSourcePoolableObject audioPoolObj in activeAudioCacheList)
+        {
+            if(audioPoolObj != null)
+            {
+                audioPoolObj.Stop();
+            }
+        }
     }
 
     /// <summary>
@@ -170,17 +227,12 @@ public class AudioManager : MonoSingleton<AudioManager>
         bgmPool = new Pool(originalAudioPoolableObject);
     }
 
-//    private AudioSourcePoolableObject PeekPool(AudioType _audioType, string _audioResourceFilePath)
-//    {
-//        AudioSourcePoolableObject poolObject =
-//            _audioType == AudioType.BGM
-//            ? bgmPool.Peek(true) as AudioSourcePoolableObject
-//            : sePool.Peek(true) as AudioSourcePoolableObject;
-//        poolObject.SetAudioClip(LoadAudioClip(_audioResourceFilePath));
-//
-//        return poolObject;
-//    }
-
+    /// <summary>
+    /// Gets the or create AudioSourcePoolableObject.
+    /// </summary>
+    /// <returns>The or create.</returns>
+    /// <param name="_audioType">Audio type.</param>
+    /// <param name="_audioResourceFilePath">Audio resource file path.</param>
     private AudioSourcePoolableObject GetOrCreate(AudioType _audioType, string _audioResourceFilePath)
     {
         AudioSourcePoolableObject poolObject =
@@ -192,6 +244,12 @@ public class AudioManager : MonoSingleton<AudioManager>
         return poolObject;
     }
 
+    /// <summary>
+    /// Loads the audio clip.
+    /// If cache exists, it will return clip from cache.
+    /// </summary>
+    /// <returns>The audio clip.</returns>
+    /// <param name="_audioResourceFilePath">Audio resource file path.</param>
     private AudioClip LoadAudioClip(string _audioResourceFilePath)
     {
         AudioClip clip = null;
@@ -213,7 +271,6 @@ public class AudioManager : MonoSingleton<AudioManager>
         }
 
         return clip;
-
     }
 
     /// <summary>
@@ -359,8 +416,12 @@ public class AudioManager : MonoSingleton<AudioManager>
             gameObject.name = this.GetType().FullName;
         }
 
+        /// <summary>
+        /// Update this instance.
+        /// </summary>
         private void Update()
         {
+            // Do nothing if callback is not set.
             if(onCompleteCallback == null)
             {
                 return;

@@ -104,6 +104,17 @@ namespace TC
         }
 
         /// <summary>
+        /// Clear every PoolableObject within Pool.
+        /// </summary>
+        public void Clear()
+        {
+            while(IsPoolObjectAvailable())
+            {
+                GameObject.Destroy(GetPoolableObject(null).gameObject);
+            }
+        }
+
+        /// <summary>
         /// Gets the poolable object from queue.
         /// </summary>
         /// <returns>The poolable object.</returns>
